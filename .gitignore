@@ -1,0 +1,10 @@
+*.swp
+
+#entornos
+__pycache__/
+venv/
+
+#data
+data/raw/
+data/transformed/
+
