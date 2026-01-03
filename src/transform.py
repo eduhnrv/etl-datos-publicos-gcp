@@ -1,48 +1,70 @@
-#transform.py
+# transform.py
 
 import pandas as pd
 from extract import extract_csv
-from pathlib import Path
 
-df = extract_csv("def_semana_epidemiologica.csv")
 
-#Limpieza de datos
-
-df["GRUPO_EDAD"] = df["GRUPO_EDAD"].str.strip()
-df["REGION"] = df["REGION"].str.strip()
-df["SEXO"] = df["SEXO"].map({1: 'M', 2: 'F'})
-
-#transformación de GRUPO_EDAD
-
-def parse_rango(rango: str):
+def parse_rango(rango: str) -> tuple[int, int]:
+    """
+    Convierte un rango de edad en edad mínima y máxima.
+    Ejemplos:
+    - '0 a 14' -> (0, 14)
+    - '80 +'   -> (80, 100)
+    """
     rango = str(rango).strip()
-    if rango.endswith("+"): #caso '80 + '
+
+    # Caso 80 +
+    if rango.endswith("+"):
         min_ = int(rango.replace("+", "").strip())
-        max_ = 100 #límite arbitrario 
+        max_ = 100  # límite arbitrario
         return min_, max_
-    if "a" in rango: #caso '0 a 14'
+
+    # Caso 0 a 14, 15 a 29, etc.
+    if "a" in rango:
         min_, max_ = rango.split(" a ")
         return int(min_.strip()), int(max_.strip())
-    return None, None # si hay un valor inesperado
+
+    return None, None
 
 
-#crear columnas, EDAD_MIN, EDAD_MAX
+def transform_dataset(file_name: str) -> pd.DataFrame:
+    """
+    Ejecuta todas las transformaciones del dataset epidemiológico.
+    Retorna un DataFrame transformado.
+    """
 
-df[["EDAD_MIN", "EDAD_MAX"]] = df["GRUPO_EDAD"].apply(lambda x: pd.Series(parse_rango(x)))
+    # ======================
+    # CARGA DATASET CRUDO
+    # ======================
+    df = extract_csv(file_name)
 
-#crear columna de edad promedio
+    # ======================
+    # LIMPIEZA DE DATOS
+    # ======================
 
-df["EDAD_PROMEDIO"] = (df["EDAD_MIN"] + df["EDAD_MAX"]) / 2
+    # Eliminación de espacios innecesarios
+    df["GRUPO_EDAD"] = df["GRUPO_EDAD"].str.strip()
+    df["REGION"] = df["REGION"].str.strip()
 
-#verificamos el resultado
+    # Mapea sexo numérico a categórico
+    df["SEXO"] = df["SEXO"].map({1: "M", 2: "F"})
 
-print(df[["GRUPO_EDAD", "EDAD_MIN", "EDAD_MAX", "EDAD_PROMEDIO"]].head())
-print(df.info())
+    # ======================
+    # TRANSFORMACIÓN GRUPO_EDAD
+    # ======================
 
-#guardar Dataset transformado
+    df[["EDAD_MIN", "EDAD_MAX"]] = df["GRUPO_EDAD"].apply(
+        lambda x: pd.Series(parse_rango(x))
+    )
 
-Path("../data/transformed").mkdir(parents = True, exist_ok = True)
-df.to_csv("../data/transformed/def_semana_epidemiologica_transformed.csv", index = False)
-print("Archivo transformado guardado en ../data/transformed/")
+    # Edad promedio
+    df["EDAD_PROMEDIO"] = (df["EDAD_MIN"] + df["EDAD_MAX"]) / 2
 
+    # ======================
+    # VALIDACIÓN BÁSICA
+    # ======================
+    #print(df[["GRUPO_EDAD", "EDAD_MIN", "EDAD_MAX", "EDAD_PROMEDIO"]].head())
+    #print(df.info())
+
+    return df
 

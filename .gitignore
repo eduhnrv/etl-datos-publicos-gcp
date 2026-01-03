@@ -1,10 +1,23 @@
+
+#==================
+#Archivos temporales
+#==================
 *.swp
 
-#entornos
-__pycache__/
+#==================
+#Entornos virtuales
+#==================
 venv/
 
-#data
+#==================
+#Python
+#==================
+__pycache__/
+*.pyc
+
+#==================
+#Data local
+#==================
 data/raw/
 data/transformed/
 
