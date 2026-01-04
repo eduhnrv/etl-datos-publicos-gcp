@@ -1,8 +1,20 @@
-# load.py
+"""
+load.py
+=======
+Módulo responsable de persistir datasets transformados
+en el filesystem local.
+
+Proyecto: ETL Datos Públicos
+Autor: E. Henríquez N.
+Fecha: 3 de enero de 2026.
+
+"""
 
 import pandas as pd
 from pathlib import Path
+from logger import setup_logger
 
+logger = setup_logger()
 
 def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> None:
     """
@@ -20,7 +32,11 @@ def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> None:
     output_path = output_dir / file_name
 
     # Guarda el DataFrame
-    df.to_csv(output_path, index=False)
+    df.to_csv(output_path, index=False, encoding = "utf-8")
 
-    print(f"Archivo cargado correctamente en: {output_path}")
+    logger.info(
+            f"Archivo cargado correctamente *local* |"
+            f"Ruta: {output_path} |"
+            f"Filas: {len(df)} | Columnas: {len(df.columns)}"
+    )
 

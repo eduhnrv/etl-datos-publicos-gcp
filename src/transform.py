@@ -1,10 +1,22 @@
-# transform.py
+'''
+transform.py
+============
+
+Proyecto: ETL Datos Públicos.
+Autor: E. Henríquez N.
+Fecha: 3 de enero de 2026.
+
+'''
 
 import pandas as pd
+from datetime import date
+from typing import Tuple, Optional
 from extract import extract_csv
+from logger import setup_logger
 
+logger = setup_logger()
 
-def parse_rango(rango: str) -> tuple[int, int]:
+def parse_rango(rango: str) -> Tuple[Optional[int],Optional [int]]:
     """
     Convierte un rango de edad en edad mínima y máxima.
     Ejemplos:
@@ -20,7 +32,7 @@ def parse_rango(rango: str) -> tuple[int, int]:
         return min_, max_
 
     # Caso 0 a 14, 15 a 29, etc.
-    if "a" in rango:
+    if " a " in rango:
         min_, max_ = rango.split(" a ")
         return int(min_.strip()), int(max_.strip())
 
@@ -32,6 +44,7 @@ def transform_dataset(file_name: str) -> pd.DataFrame:
     Ejecuta todas las transformaciones del dataset epidemiológico.
     Retorna un DataFrame transformado.
     """
+    logger.info("inicio de transformaciones del dataset")
 
     # ======================
     # CARGA DATASET CRUDO
@@ -60,11 +73,20 @@ def transform_dataset(file_name: str) -> pd.DataFrame:
     # Edad promedio
     df["EDAD_PROMEDIO"] = (df["EDAD_MIN"] + df["EDAD_MAX"]) / 2
 
+
+    #============================
+    #CREACIÓN COLUMNA FECHA_CARGA
+    #============================
+     
+    df["FECHA_CARGA"] = date.today()
+
     # ======================
     # VALIDACIÓN BÁSICA
     # ======================
     #print(df[["GRUPO_EDAD", "EDAD_MIN", "EDAD_MAX", "EDAD_PROMEDIO"]].head())
     #print(df.info())
+
+    logger.info("Transformación completada 100%")
 
     return df
 
