@@ -15,10 +15,10 @@ Fecha: 3 de enero de 2026.
 """
 
 from pathlib import Path
-from transform import transform_dataset
-from load import load_csv
-from load_gcs import load_csv_to_gcs
-from logger import setup_logger
+from src.transform import transform_dataset
+from src.load import load_csv
+from src.load_gcs import load_csv_to_gcs
+from src.logger import setup_logger
 
 logger = setup_logger()
 

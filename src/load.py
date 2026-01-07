@@ -12,7 +12,7 @@ Fecha: 3 de enero de 2026.
 
 import pandas as pd
 from pathlib import Path
-from logger import setup_logger
+from src.logger import setup_logger
 
 logger = setup_logger()
 
