@@ -16,7 +16,7 @@ from src.logger import setup_logger
 
 logger = setup_logger()
 
-def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> None:
+def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> Path:
     """
     Guarda un DataFrame como CSV en el directorio indicado.
 
@@ -24,7 +24,16 @@ def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> None:
     - df: DataFrame transformado
     - output_dir: Path donde se guardará el archivo
     - file_name: nombre del archivo CSV final
+
+    Retorna:
+    - Path al archivo CSV creado.
     """
+
+    #Validaciones
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Debe ser un DataFrame")
+    if df.empty:
+        raise ValueError("El DataFrame está vacío")
 
     # Crea el directorio si no existe
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -39,4 +48,6 @@ def load_csv(df: pd.DataFrame, output_dir: Path, file_name: str) -> None:
             f"Ruta: {output_path} |"
             f"Filas: {len(df)} | Columnas: {len(df.columns)}"
     )
+
+    return output_path
 
