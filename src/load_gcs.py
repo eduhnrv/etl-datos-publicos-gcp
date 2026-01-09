@@ -13,7 +13,7 @@ Fecha: 3 de enero de 2026.
 """
 
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from google.cloud import storage
 from src.logger import setup_logger
 
@@ -57,7 +57,7 @@ def load_csv_to_gcs(base_file_name: str) -> None:
     logger.info("Inicio de carga de dataset a Google Cloud Storage")
 
     #fecha de ejecución en formato ISO(8601)
-    execution_date = datetime.utcnow().strftime("%Y-%m-%d")
+    execution_date = datetime.now(UTC).strftime("%Y-%m-%d")
 
     #rutas de archivos
     local_file_path = LOCAL_TRANSFORMED_DIR / f"{base_file_name}.csv"
