@@ -4,23 +4,33 @@ extract.py
 
 Validación de existencia y extracción del archivo 
 
+Responsabilidades:
+- Verificar existencia del archivo.
+- Leer el CSV con separador esperado.
+- Validar que el archivo no esté vacío.
+- Validar esquema mínimo requerido.
+
+
 Proyecto: ETL Datos Públicos
 Autor: E. Henríquez. N.
 Fecha: 3 de enero de 2026.
 
 '''
 
-
 import pandas as pd
 from pathlib import Path
+from pandas.errors import EmptyDataError
 from src.logger import setup_logger
 
 logger = setup_logger()
 
 #Directorio donde se almacenan los csv crudos descargados
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Directorio donde se almacenan los CSV crudos
 RAW_DIR = BASE_DIR / "data" / "raw"
 
+# Esquema mínimo esperado
 EXPECTED_COLUMNS = {
     "ANO_ESTADISTICO",
     "SEMANA_ESTADISTICA",
@@ -40,7 +50,7 @@ def extract_csv(file_name: str) -> pd.DataFrame:
     ----------
     file_name : str
         Nombre del archivo CSV a cargar.
-
+    
     Retorna
     -------
     pd.DataFrame
@@ -52,6 +62,10 @@ def extract_csv(file_name: str) -> pd.DataFrame:
         Si el archivo no existe.
     ValueError
         Si el CSV no cumple con el esquema esperado.
+    EmptyDataError
+        Si el archivo está vacío.
+    PermissionError
+        Si no se puede leer el archivo por permisos.
     """
 
     file_path = RAW_DIR / file_name #construye la ruta completa al archivo
@@ -61,7 +75,18 @@ def extract_csv(file_name: str) -> pd.DataFrame:
         raise FileNotFoundError(file_path)
 
     logger.info(f"Cargando archivo RAW: {file_path}")
-    df = pd.read_csv(file_path, sep = '|') #lee el .csv '|' separador
+    try:
+        df = pd.read_csv(file_path, sep = '|') #lee el .csv '|' separador
+    except EmptyDataError:
+        logger.error(f"El archivo {file_name} está vacío")
+        raise
+    except PermissionError as e:
+        logger.error(f"No se pudo leer el archivo {file_name}: {e}")
+        raise
+
+    if df.empty:
+        logger.error(f"El Archivo {file_name} no contiene filas")
+        raise ValueError("El archivo csv está vacío")
 
     #=====================
     #Validación de esquema
@@ -80,11 +105,3 @@ def extract_csv(file_name: str) -> pd.DataFrame:
     logger.info(f"CSV cargado correctamente | Filas = {len(df)} | Columnas = {len(df.columns)}")
 
     return df
-
-#ejecución local
-if __name__ == "__main__":
-
-    df = extract_csv("def_semana_epidemiologica.csv")
-    logger.info(df.info())
-    
-

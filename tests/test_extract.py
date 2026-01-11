@@ -4,11 +4,14 @@ test_extract.py
 
 Tests unitarios para el módulo extract.py.
 
-Este módulo valida el correcto funcionamiento de la etapa de extracción
-del pipeline ETL, asegurando que:
-- Los archivos CSV existentes se cargan correctamente.
-- Se lanzan excepciones apropiadas cuando el archivo no existe.
-- El DataFrame retornado cumple con las expectativas básicas.
+Valida:
+- Carga correcta de CSV válido.
+- Error si el archivo no existe.
+- Error ante CSV malformado.
+- Error ante esquema inválido.
+- Error ante CSV vacío.
+- Propagación de errores inesperados de pandas.
+
 
 Proyecto: ETL Datos Públicos
 Autor: E. Henríquez N.
@@ -19,6 +22,7 @@ import pandas as pd
 import pytest
 from pathlib import Path
 import pandas.errors as pd_errors
+from unittest.mock import patch
 
 from src.extract import extract_csv
 
@@ -93,3 +97,32 @@ def test_extract_csv_invalid_schema(monkeypatch):
     
     with pytest.raises(ValueError):
         extract_csv("invalid_schema_raw.csv")
+
+def test_extract_csv_empty_dataframe(monkeypatch, tmp_path):
+    """
+    Valida que se lance ValueError cuando el csv existe pero no contiene filas
+    """
+
+    csv_file = tmp_path / "empty.csv"
+    csv_file.write_text("ANO_ESTADISTICO|SEMANA_ESTADISTICA\n")
+
+    import src.extract as extract 
+    monkeypatch.setattr(extract, "RAW_DIR", tmp_path)
+
+    with pytest.raises(ValueError):
+        extract_csv("empty.csv")
+
+def test_extract_csv_generic_pandas_error(monkeypatch, tmp_path):
+    """
+    Valida que errores inesperados de pandas se propaguen correctamente
+    """
+
+    csv_file = tmp_path / "data.csv"
+    csv_file.write_text("A|B\n1|2")
+
+    import src.extract as extract
+    monkeypatch.setattr(extract, "RAW_DIR", tmp_path)
+
+    with patch("pandas.read_csv", side_effect=RuntimeError("Error interno")):
+        with pytest.raises(RuntimeError):
+            extract_csv("data.csv")

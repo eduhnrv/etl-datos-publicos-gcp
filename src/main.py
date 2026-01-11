@@ -3,10 +3,9 @@ main.py
 =======
 
 Orquestador ETL, etapas:
-    1.- Extracción de datos(extract).
-    2.- Transformación de datos(transform).
-    3.- Carga local del dataset transformado.
-    4.- Carga del dataset tranformado al Data Lake(GCS)
+    1.- Transformación de datos(transform).
+    2.- Carga local del dataset transformado.
+    3.- Carga del dataset tranformado al Data Lake(GCS)
 
 Proyecto: ETL Datos Públicos.
 Autor: E. Henríquez N.
@@ -15,6 +14,9 @@ Fecha: 3 de enero de 2026.
 """
 
 from pathlib import Path
+import os
+import sys
+
 from src.transform import transform_dataset
 from src.load import load_csv
 from src.load_gcs import load_csv_to_gcs
@@ -25,15 +27,21 @@ logger = setup_logger()
 def main():
     """
     Orquesta el pipeline ETL completo:
-    Extract -> Transform -> Load
+    Transform -> Load local -> Load GCP
     """
     logger.info("Inicio del pipeline ETL")
+
+    #=======================
+    #VALIDACION CREDENCIALES
+    #=======================
+    if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+        logger.error("Credenciales de GCP no configuradas")
+        raise SystemExit("Credenciales GCP Faltantes")
 
     # ======================
     # CONFIGURACIÓN
     # ======================
     BASE_DIR = Path(__file__).resolve().parent.parent
-
     input_file = "def_semana_epidemiologica.csv"
     output_dir = BASE_DIR /"data" / "transformed"
     base_output_file = "def_semana_epidemiologica_transformed"
@@ -69,7 +77,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception:
-        logger.error("Ejecución del pipeline fallida", exc_info = True)
+        logger.error("Ejecucion del pipeline fallida")
         raise
 
 

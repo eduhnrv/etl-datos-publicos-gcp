@@ -1,0 +1,22 @@
+# Imagen base ligera de Python
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Copiar dependencias primero
+COPY requirements.txt .
+COPY requirements-test.txt .
+
+RUN pip install --no-cache-dir --root-user-action=ignore -r requirements.txt \
+    && pip install --no-cache-dir --root-user-action=ignore -r requirements-test.txt
+
+# Copiar código y tests
+COPY src/ src/
+COPY tests/ tests/
+
+# Evitar buffering en logs
+ENV PYTHONUNBUFFERED=1
+
+# Comando por defecto: ejecutar pytest
+CMD ["pytest", "-v", "--cov=src"]
+

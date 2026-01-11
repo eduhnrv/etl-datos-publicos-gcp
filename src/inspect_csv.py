@@ -1,3 +1,19 @@
+"""
+inspect_csv.py
+==============
+
+Inspección exploratoria de archivos CSV crudos.
+
+Este módulo permite cargar un archivo CSV desde el directorio `data/raw` y mostrar información básica
+sobre su contenido: dimensiones, tipos de datos, estadísticas descriptivas y valores nulos por columna.
+Está pensado como una herramienta de diagnóstico rápido para validar la estructura y calidad de los datos
+antes de su transformación en el pipeline ETL.
+
+Proyecto: ETL Datos Públicos
+Autor: E. Henríquez. N.
+Fecha: 9 de enero de 2026.
+"""
+
 import pandas as pd
 from pathlib import Path
 
