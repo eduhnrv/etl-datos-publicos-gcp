@@ -83,11 +83,15 @@ etl-datos-publicos-gcp/
 │
 ├── data/
 │   ├── raw/
-│   │   └── def_semana_epidemilogica.csv
+│   │   └── def_semana_epidemiologica.csv
 │   └── transformed/
 │
+│
 ├── docs/
-│   └── data_source.md
+│   ├── data_source.md
+│   └── images/
+│       ├── tests.png
+│       └── pipeline_run.png
 │
 ├── Dockerfile
 ├── Dockerfile.test
