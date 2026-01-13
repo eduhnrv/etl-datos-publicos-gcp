@@ -14,7 +14,7 @@ El foco del proyecto está puesto en la calidad del dato, la separación clara d
 
 ## Datos de origen
 
-El pipeline procesa un dataset público del Ministerio de Salud de Chile, relacionados con estadísticas epidemiológicas de defunciones a lo largo del país, contemplando todas las regiones del territorio.
+El pipeline procesa un dataset público del Ministerio de Salud de Chile, relacionado con estadísticas epidemiológicas de defunciones a lo largo del país, contemplando todas las regiones del territorio.
 
 Características principales de los datos:
 
@@ -83,7 +83,7 @@ etl-datos-publicos-gcp/
 │
 ├── data/
 │   ├── raw/
-│   │   └── dataset_raw.csv
+│   │   └── def_semana_epidemilogica.csv
 │   └── transformed/
 │
 ├── docs/
@@ -134,7 +134,7 @@ sudo docker run --rm \
   -e GOOGLE_APPLICATION_CREDENTIALS=/app/cred.json \
   etl-datos-publicos
 ```
-<br>
+
 
 ### Testing
 ### Construcción de la imagen
@@ -146,6 +146,17 @@ sudo docker build -t etl-test -f Dockerfile.test .
 ```bash
 sudo docker run --rm etl-test
 ```
+
+## Credenciales y seguridad
+
+La etapa de carga del pipeline hacia Google Cloud Storage requiere credenciales válidas de Google Cloud, provistas mediante Service Account.
+
+Por motivos de seguridad, el archivo de credenciales (`cred.json`) **no se incluye ni se versiona** en este repositorio. Para ejecutar el pipeline completo es necesario proveer por cuenta propia dicho archivo y definir la variable de entorno `GOOGLE_APPLICATION_CREDENTIALS` al momento de ejecutar el contenedor.
+
+El pipeline puede ejecutarse localmente hasta la etapa de transformación sin necesidad de credenciales cloud, permitiendo revisar y validar la lógica de extracción, inspección y transformación de los datos sin acceso a GCP.
+
+De esta forma se busca replicar prácticas habituales en entornos productivos, donde las credenciales se gestionan de forma externa al código.
+
 
 ---
 

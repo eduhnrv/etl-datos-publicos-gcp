@@ -2,6 +2,16 @@
 transform.py
 ============
 
+Módulo responsable de aplicar transformaciones al dataset epidemiológico
+extraído desde fuentes públicas del Ministerio de Salud de Chile.
+
+Las transformaciones incluyen:
+- Limpieza de campos categóricos.
+- Normalización de variables demográficas.
+- Derivación de rangos etarios en valores numéricos.
+- Creación de métricas auxiliares
+- Incorporación de metadatos de carga.
+
 Proyecto: ETL Datos Públicos.
 Autor: E. Henríquez N.
 Fecha: 3 de enero de 2026.
@@ -43,6 +53,14 @@ def transform_dataset(file_name: str) -> pd.DataFrame:
     """
     Ejecuta todas las transformaciones del dataset epidemiológico.
     Retorna un DataFrame transformado.
+
+    Incluye:
+    - Limpieza de columnas categóricas.
+    - Normalización de valores de sexo.
+    - Transformación de rangos etarios en variables numéricas.
+    - Cálculo de edad promedio.
+    - Incorporación de fecha de carga.
+
     """
     logger.info("inicio de transformaciones del dataset")
 
